@@ -11,7 +11,7 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
     {
         #region Atributos
 
-        private ApontamentoContexto _contexto;
+        private ConProContexto _contexto;
 
         private Implementacao _implementacaoAtual;
 
@@ -33,7 +33,7 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
         }
 
-        public ImplementacaoNegocio( IImplementacao interfaceImplementacao, INotificacao interfaceNotificadora, ApontamentoContexto contexto )
+        public ImplementacaoNegocio( IImplementacao interfaceImplementacao, INotificacao interfaceNotificadora, ConProContexto contexto )
         {
             _implementacao = interfaceImplementacao;
             _notificadora = interfaceNotificadora;

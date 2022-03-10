@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ControladorProjetos.CamadaRepositorio
 {
-    public class ApontamentoContexto : DbContext
+    public class ConProContexto : DbContext
     {
         #region Atributos
 
@@ -20,7 +20,7 @@ namespace ControladorProjetos.CamadaRepositorio
 
         #region Construtores
 
-        public ApontamentoContexto(DbContextOptions opcoes) : base(opcoes)
+        public ConProContexto(DbContextOptions opcoes) : base(opcoes)
         {
 
         }

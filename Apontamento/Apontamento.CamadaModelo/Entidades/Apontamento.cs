@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ControladorProjetos.CamadaModelo.Entidades
 {
-    [Table("APONTAMENTO")]
+    [Table( "APONTAMENTO" )]
     public class Apontamento
     {
         #region Atributos
@@ -14,34 +15,56 @@ namespace ControladorProjetos.CamadaModelo.Entidades
 
         #region Propriedades
 
-        [Column("COD_APONTAMENTO")]
+        [Column( "COD_APONTAMENTO" )]
         [Key]
         public int CodigoApontamento { get; set; }
 
         [Required]
-        [Column("DATA_INICIO")]
+        [Column( "DATA_INICIO" )]
         public DateTime DataInicio { get; set; }
 
-        [Column("DATA_FIM")]
+        [JsonIgnore]
+        [Column( "DATA_FIM" )]
         public DateTime DataFim { get; set; }
 
-        [Column("DES_REALIZADO")]
-        [Required]
+        [Column( "DES_REALIZADO" )]
         public string DescricaoRealizado { get; set; }
 
-        [ForeignKey("COD_IMPLEMENTACAO")]
-        public Implementacao Implementacao { get; set; } 
+        [ForeignKey( "COD_IMPLEMENTACAO" )]
+        public Implementacao Implementacao { get; set; }
 
-        [Column("TEMPO")]
+        [JsonIgnore]
+        [Column( "TEMPO" )]
         public TimeSpan Tempo { get; set; }
 
         #endregion Propriedades
 
         #region Construtores
 
-        public Apontamento()
-        {
+        //internal Apontamento()
+        //{
 
+        //}
+
+        public Apontamento( Implementacao implementacao )
+        {
+            Implementacao = implementacao;
+        }
+
+        public Apontamento( DateTime dataInicio )
+        {
+            DataInicio = dataInicio;
+            DescricaoRealizado = string.Empty;
+        }
+
+        public Apontamento( int codigoApontamento, DateTime dataInicio, DateTime dataFim, string descricaoRealizado, Implementacao implementacao, TimeSpan tempo )
+        {
+            CodigoApontamento = codigoApontamento;
+            DataInicio = dataInicio;
+            DataFim = dataFim;
+            DescricaoRealizado = descricaoRealizado;
+            Implementacao = implementacao;
+            Tempo = tempo;
         }
 
         #endregion Construtores

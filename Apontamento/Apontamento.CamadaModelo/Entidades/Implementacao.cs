@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ControladorProjetos.CamadaModelo.Entidades
 {
@@ -22,12 +23,14 @@ namespace ControladorProjetos.CamadaModelo.Entidades
         [Required]
         public string Descricao { get; set; }
 
+        [JsonIgnore]
         [Column("TEMPO_TOTAL")]
         public TimeSpan TempoTotal { get; set; }
 
         [Column("COBRADO")]
         public bool Cobrado { get; set; }
 
+        [JsonIgnore]
         public ICollection<Apontamento> Apontamentos { get; set; }
 
         #endregion Propriedades

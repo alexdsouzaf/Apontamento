@@ -1,10 +1,11 @@
-﻿using BibliotecaPublica.CamadaNotificadora.Interfaces;
-using ControladorProjetos.CamadaNegocio.Intefaces;
+﻿using BibliotecaPublica.CamadaNotificadora;
+using BibliotecaPublica.CamadaNotificadora.Interfaces;
 using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaRepositorio;
-using FluentValidation.Results;
+using ControladorProjetos.CamadaNegocio.Intefaces;
 using ControladorProjetos.CamadaNegocio.Validadores;
+using ControladorProjetos.CamadaRepositorio;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace ControladorProjetos.CamadaNegocio.Negocios
 {
@@ -12,27 +13,35 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
     {
         #region Atributos
 
-        private ApontamentoContexto _contexto;
+        private ConProContexto _contexto;
 
         private Apontamento _apontamentoAtual;
 
-        private readonly IApontamento _apontamento;
-        private readonly INotificacao _notificadora;
+        private IApontamento _apontamento;
+        private INotificacao _notificadora;
 
         #endregion Atributos
 
         #region Propriedades
 
+        public IApontamento Apontamento {
+            set {
+                _apontamento = value;
+            }
+        }
 
+        public INotificacao Notificadora {
+            set {
+                _notificadora = value;
+            }
+        }
 
         #endregion Propriedades
 
         #region Construtores
 
-        public ApontamentoNegocio( IApontamento interfaceImplementacao, INotificacao interfaceNotificadora, ApontamentoContexto contexto )
+        public ApontamentoNegocio( ConProContexto contexto )
         {
-            _apontamento = interfaceImplementacao;
-            _notificadora = interfaceNotificadora;
             _contexto = contexto;
         }
 
@@ -78,12 +87,34 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
         #region Públicos
 
-        public void Cadastrar()
+        public Apontamento Cadastrar( int codigoImplementacao )
         {
-            _contexto.Set<Apontamento>().Add( _apontamentoAtual );
-            _contexto.SaveChanges();
+            Implementacao implementacao;
 
-            _apontamentoAtual = null;
+            try
+            {
+                implementacao = _contexto.Set<Implementacao>().Find( codigoImplementacao );
+
+                if ( implementacao == null )
+                {
+                    _notificadora.Notificacoes.Adicionar( new Notificacao( "404", "Implementação", "Não foi encontrado nenhuma implementação." ) );
+                    return null;
+                }
+
+                _apontamentoAtual.Implementacao = implementacao;
+
+                _contexto.Set<Apontamento>().Add( _apontamentoAtual );
+                _contexto.SaveChanges();
+
+                _apontamentoAtual = null;
+
+                return _apontamentoAtual;
+            }
+            catch ( Exception ex )
+            {
+                _notificadora.Notificacoes.Adicionar( new Notificacao( "400", "Exceção", $"{ex}" ) );
+                return null;
+            }
         }
 
         public void Alterar()
@@ -116,23 +147,18 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
             _apontamentoAtual = null;
         }
 
-        public bool ValidarApontamento( string tipoApontamento )
+        public bool ValidarApontamento( string tipoValidacao, Apontamento apontamento )
         {
             ValidationResult resultadoValidacao;
             ApontamentoValidador validador = new ApontamentoValidador();
 
-            _apontamentoAtual = new Apontamento();
+            _apontamentoAtual = apontamento;
 
-            _apontamentoAtual.DataInicio = _apontamento.DataInicio;
-            _apontamentoAtual.Implementacao = ( new ImplementacaoNegocio() ).BuscarPorCodigo( _apontamento.CodigoImplementacao );
-
-            resultadoValidacao = validador.Validate( _apontamentoAtual, opcao => opcao.IncludeRuleSets( tipoApontamento ) );
+            resultadoValidacao = validador.Validate( _apontamentoAtual, opcao => opcao.IncludeRuleSets( tipoValidacao ) );
 
             if ( !resultadoValidacao.IsValid )
             {
                 _notificadora.Notificacoes.AdicionarResultadoValidacao( resultadoValidacao );
-                _notificadora.Notificar();
-
                 return false;
             }
 

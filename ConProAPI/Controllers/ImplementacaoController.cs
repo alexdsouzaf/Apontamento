@@ -1,5 +1,5 @@
 ﻿using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaRepositorio;
+using ControladorProjetos.CamadaNegocio.Negocios;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConProAPI.Controllers
@@ -7,17 +7,31 @@ namespace ConProAPI.Controllers
     [Route( "implementacao" )]
     public class ImplementacaoController : ControllerBase
     {
-        private ConProContexto _contexto;
+        private ImplementacaoNegocio _negocio;
 
-        public ImplementacaoController( ConProContexto contexto )
+        public ImplementacaoController( ImplementacaoNegocio negocio )
         {
-            _contexto = contexto;
+            _negocio = negocio;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Implementacao>> BuscarTudo()
         {
-            return _contexto.Set<Implementacao>();
+            try
+            {
+                IEnumerable<Implementacao> implementacoes = _negocio.BuscarTudo();
+
+                if ( implementacoes == null )
+                {
+                    return NotFound( "Não há implementações cadastradas." );
+                }
+
+                return Ok( implementacoes );
+            }
+            catch ( Exception ex )
+            {
+                return BadRequest( $"{ex}" );
+            }
         }
 
         [HttpPost( "IniciarNovaImplementacao" )]
@@ -25,8 +39,12 @@ namespace ConProAPI.Controllers
         {
             try
             {
-                _contexto.Set<Implementacao>().Add( implementacao );
-                _contexto.SaveChanges();
+                if ( !_negocio.ValidarImplementacao( implementacao ) )
+                {
+                    return BadRequest( _negocio.Notificacoes );
+                }
+
+                _negocio.Cadastrar();
             }
             catch ( Exception ex )
             {
@@ -35,31 +53,5 @@ namespace ConProAPI.Controllers
 
             return Ok( implementacao );
         }
-
-        //public ActionResult IniciarNovoApontamento( int codigoImplementacao )
-        //{
-        //    Implementacao implementacao;
-        //    Apontamento apontamento = new Apontamento( DateTime.Now );
-        //    try
-        //    {
-        //        implementacao = _contexto.Set<Implementacao>().Find( codigoImplementacao );
-
-        //        if ( implementacao == null )
-        //        {
-        //            NotFound( "Não foi encontrado nenhuma implementação" );
-        //        }
-
-        //        implementacao.Apontamentos = BuscarApontamentoPorImplementacao( codigoImplementacao ).Value as ICollection<Apontamento>;
-        //        implementacao.Apontamentos.Add( apontamento );
-
-        //        return Ok( )
-        //    }
-        //    catch ( Exception ex )
-        //    {
-
-        //        throw;
-        //    }
-
-        //}
     }
 }

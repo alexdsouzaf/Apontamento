@@ -1,7 +1,4 @@
-﻿using BibliotecaPublica.CamadaNotificadora;
-using BibliotecaPublica.CamadaNotificadora.Interfaces;
-using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaNegocio.Intefaces;
+﻿using ControladorProjetos.CamadaModelo.Entidades;
 using ControladorProjetos.CamadaNegocio.Validadores;
 using ControladorProjetos.CamadaRepositorio;
 using FluentValidation;
@@ -17,22 +14,19 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
         private Apontamento _apontamentoAtual;
 
-        private IApontamento _apontamento;
-        private INotificacao _notificadora;
+        private string _notificacoes;
 
         #endregion Atributos
 
         #region Propriedades
 
-        public IApontamento Apontamento {
-            set {
-                _apontamento = value;
+        public string Notificacoes {
+            get {
+                return _notificacoes;
             }
-        }
 
-        public INotificacao Notificadora {
             set {
-                _notificadora = value;
+                _notificacoes = value;
             }
         }
 
@@ -57,7 +51,36 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
         #endregion Sobreescritos
 
+        private void AdicionarNotificacoes( ValidationResult resultado )
+        {
+            _notificacoes = string.Empty;
 
+            foreach ( ValidationFailure item in resultado.Errors )
+            {
+                _notificacoes += $"- {item.ErrorMessage}";
+            }
+        }
+
+        private bool ValidarApontamento( string tipoValidacao, Apontamento apontamento )
+        {
+            ValidationResult resultadoValidacao;
+            ApontamentoValidador validador = new ApontamentoValidador();
+
+            if ( _apontamentoAtual != apontamento )
+            {
+                _apontamentoAtual = apontamento;
+            }
+
+            resultadoValidacao = validador.Validate( _apontamentoAtual, opcao => opcao.IncludeRuleSets( tipoValidacao ) );
+
+            if ( !resultadoValidacao.IsValid )
+            {
+                AdicionarNotificacoes( resultadoValidacao );
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion Privados
 
@@ -87,6 +110,8 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
         #region Públicos
 
+        #region CRUD
+
         public Apontamento Cadastrar( int codigoImplementacao )
         {
             Implementacao implementacao;
@@ -97,7 +122,7 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
                 if ( implementacao == null )
                 {
-                    _notificadora.Notificacoes.Adicionar( new Notificacao( "404", "Implementação", "Não foi encontrado nenhuma implementação." ) );
+                    _notificacoes = "- Não foi encontrado nenhuma implementação.";
                     return null;
                 }
 
@@ -110,10 +135,9 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
                 return _apontamentoAtual;
             }
-            catch ( Exception ex )
+            catch ( Exception )
             {
-                _notificadora.Notificacoes.Adicionar( new Notificacao( "400", "Exceção", $"{ex}" ) );
-                return null;
+                throw;
             }
         }
 
@@ -121,8 +145,6 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
         {
             _contexto.Set<Apontamento>().Update( _apontamentoAtual );
             _contexto.SaveChanges();
-
-            _apontamentoAtual = null;
         }
 
         #region Buscas
@@ -132,9 +154,43 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
             return _contexto.Set<Apontamento>();
         }
 
-        public Apontamento BuscarPorCodigo()
+        public Apontamento BuscarPorCodigo( int codigo )
         {
-            return _contexto.Set<Apontamento>().FirstOrDefault( apontamento => apontamento.CodigoApontamento == _apontamento.CodigoApontamento );
+            return _contexto.Set<Apontamento>().FirstOrDefault( apontamento => apontamento.CodigoApontamento == codigo );
+        }
+
+        public IEnumerable<Apontamento> BuscarApontamentoPorImplementacao( int codigoImplementacao )
+        {
+            ImplementacaoNegocio implementacaoNegocio = new ImplementacaoNegocio( _contexto );
+
+            try
+            {
+                Implementacao implementacao = implementacaoNegocio.BuscarPorCodigo( codigoImplementacao );
+
+                if ( implementacao == null )
+                {
+                    _notificacoes = "Nenhuma implementação com esse código foi localizado.";
+                    return null;
+                }
+
+                if ( implementacao.Apontamentos == null )
+                {
+                    implementacao.Apontamentos = _contexto.Set<Apontamento>().Where( apontamento => apontamento.Implementacao.CodigoImplementacao == codigoImplementacao ).ToList();
+                }
+
+                if ( !implementacao.Apontamentos.Any() )
+                {
+                    _notificacoes = "Não existe apontamentos para essa implementação.";
+                    return null;
+                }
+
+                return implementacao.Apontamentos;
+            }
+            catch ( Exception )
+            {
+
+                throw;
+            }
         }
 
         #endregion Buscas
@@ -147,22 +203,50 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
             _apontamentoAtual = null;
         }
 
-        public bool ValidarApontamento( string tipoValidacao, Apontamento apontamento )
+        #endregion CRUD
+
+        public Apontamento FecharApontamento( int codigoApontamento, string descricao )
         {
-            ValidationResult resultadoValidacao;
-            ApontamentoValidador validador = new ApontamentoValidador();
-
-            _apontamentoAtual = apontamento;
-
-            resultadoValidacao = validador.Validate( _apontamentoAtual, opcao => opcao.IncludeRuleSets( tipoValidacao ) );
-
-            if ( !resultadoValidacao.IsValid )
+            try
             {
-                _notificadora.Notificacoes.AdicionarResultadoValidacao( resultadoValidacao );
+                _apontamentoAtual = _contexto.Set<Apontamento>().FirstOrDefault( apontamento => apontamento.CodigoApontamento == codigoApontamento );
+
+                if ( _apontamentoAtual == null )
+                {
+                    _notificacoes = "Não foi localizado nenhum apontamento com esse código.";
+                    return null;
+                }
+
+                _apontamentoAtual.DataFim = DateTime.Now;
+                _apontamentoAtual.DescricaoRealizado = descricao;
+                _apontamentoAtual.CalcularTempoApontamento();
+
+                //Alterar();
+
+                return _apontamentoAtual;
+            }
+            catch ( Exception )
+            {
+                throw;
+            }
+        }
+
+        public bool ValidarNovoApontamento()
+        {
+            return ValidarApontamento( "NovoApontamento", new Apontamento( DateTime.Now ) );
+        }
+
+        public bool ValidarFechamento()
+        {
+            //Apontamento apontamento = BuscarPorCodigo( codigo );
+
+            if ( _apontamentoAtual == null )
+            {
+                _notificacoes = "Não há nenhum apontamento com esse código";
                 return false;
             }
 
-            return true;
+            return ValidarApontamento( "FecharApontamento", _apontamentoAtual );
         }
 
         #endregion Públicos

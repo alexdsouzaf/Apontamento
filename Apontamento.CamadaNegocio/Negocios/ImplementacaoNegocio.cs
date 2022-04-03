@@ -11,34 +11,40 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
     {
         #region Atributos
 
+        private string _notificacoes;
+        
         private ConProContexto _contexto;
 
         private Implementacao _implementacaoAtual;
 
         private readonly IImplementacao _implementacao;
-        private readonly INotificacao _notificadora;
+
 
         #endregion Atributos
 
         #region Propriedades
 
-
+        public string Notificacoes {
+            get {
+                return _notificacoes;
+            }
+        }
 
         #endregion Propriedades
 
         #region Construtores
 
-        public ImplementacaoNegocio()
+        public ImplementacaoNegocio( ConProContexto contexto )
         {
-
-        }
-
-        public ImplementacaoNegocio( IImplementacao interfaceImplementacao, INotificacao interfaceNotificadora, ConProContexto contexto )
-        {
-            _implementacao = interfaceImplementacao;
-            _notificadora = interfaceNotificadora;
             _contexto = contexto;
         }
+
+        //public ImplementacaoNegocio( IImplementacao interfaceImplementacao, INotificacao interfaceNotificadora, ConProContexto contexto )
+        //{
+        //    _implementacao = interfaceImplementacao;
+        //    _notificadora = interfaceNotificadora;
+        //    _contexto = contexto;
+        //}
 
         #endregion Construtores
 
@@ -52,7 +58,15 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
 
         #endregion Sobreescritos
 
+        private void AdicionarValidacoes( ValidationResult resultado )
+        {
+            _notificacoes = string.Empty;
 
+            foreach ( ValidationFailure falha in resultado.Errors )
+            {
+                _notificacoes += $"- {falha.ErrorMessage}\n";
+            }
+        }
 
         #endregion Privados
 
@@ -110,7 +124,7 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
             return _contexto.Set<Implementacao>().FirstOrDefault( implementacao => implementacao.CodigoImplementacao == _implementacao.CodigoImplementacao );
         }
 
-        public Implementacao BuscarPorCodigo(int codigo)
+        public Implementacao BuscarPorCodigo( int codigo )
         {
             return _contexto.Set<Implementacao>().FirstOrDefault( implementacao => implementacao.CodigoImplementacao == codigo );
         }
@@ -125,26 +139,20 @@ namespace ControladorProjetos.CamadaNegocio.Negocios
             _implementacaoAtual = null;
         }
 
-        public bool ValidarImplementacao()
+        public bool ValidarImplementacao( Implementacao implementacao )
         {
             ValidationResult resultadoValidacao;
             ImplementacaoValidador validador = new ImplementacaoValidador();
 
-            _implementacaoAtual = new Implementacao();
-
-            _implementacaoAtual.Descricao = _implementacao.Descricao;
-            _implementacaoAtual.Cobrado = _implementacao.Cobrado;
-            _implementacaoAtual.TempoTotal = new TimeSpan();
-
-            resultadoValidacao = validador.Validate( _implementacaoAtual );
+            resultadoValidacao = validador.Validate( implementacao );
 
             if ( !resultadoValidacao.IsValid )
             {
-                _notificadora.Notificacoes.AdicionarResultadoValidacao( resultadoValidacao );
-                _notificadora.Notificar();
-
+                AdicionarValidacoes( resultadoValidacao );
                 return false;
             }
+
+            _implementacaoAtual = implementacao;
 
             return true;
         }

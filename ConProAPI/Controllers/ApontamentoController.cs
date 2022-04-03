@@ -11,18 +11,11 @@ namespace ConProAPI.Controllers
 {
     [Route( "api/[controller]" )]
     [ApiController]
-    public class ApontamentoController : ControllerBase, IApontamento, INotificacao
+    public class ApontamentoController : ControllerBase, IApontamento
     {
-        private ConProContexto _contexto;
         private ApontamentoNegocio _negocio;
 
         #region Propriedades
-
-        #region INotificacao
-
-        public NotificacaoColecao Notificacoes => throw new NotImplementedException();
-
-        #endregion INotificacao
 
         #region IApontamento
 
@@ -50,54 +43,46 @@ namespace ConProAPI.Controllers
             _negocio = apontamentoNegocio;
         }
 
-        #region INotificacao
-
-        public void AdicionarNotificacoes( ValidationResult resultado )
-        {
-            Notificacoes.AdicionarResultadoValidacao( resultado );
-        }
-
-        public bool TemNotificacao()
-        {
-            return Notificacoes.TemNotificacao;
-        }
-
-        public void Notificar()
-        {
-
-        }
-
-        #endregion INotificacao
-
         #region Rotas
 
         [HttpPost( "IniciarNovoApontamento" )]
         public ActionResult<Apontamento> IniciarNovoApontamento( int codigoImplementacao )
         {
-            Implementacao implementacao;
-
             try
             {
-                //implementacao = _contexto.Set<Implementacao>().Find( codigoImplementacao );
-
-                //if ( implementacao == null )
-                //{
-                //    return BadRequest( "Não foi encontrado nenhuma implementação." );
-                //}
-
-                //apontamento.Implementacao = implementacao;
-
-                //_contexto.Set<Apontamento>().Add( apontamento );
-                //_contexto.SaveChanges();
-
-                //return Ok( apontamento );
-
-                if ( !_negocio.ValidarApontamento( "NovoApontamento", new Apontamento( DateTime.Now ) ) )
+                if ( !_negocio.ValidarNovoApontamento() )
                 {
-                    return BadRequest( Notificacoes.ToString() );
+                    return BadRequest( _negocio.Notificacoes );
                 }
 
                 Apontamento apontamento = _negocio.Cadastrar( codigoImplementacao );
+
+                return Ok( apontamento );
+            }
+            catch ( Exception ex )
+            {
+                return BadRequest( $"{ex}" );
+            }
+        }
+
+        [HttpPost( "FinalizarApontamentoAberto" )]
+        public ActionResult<Apontamento> FinalizarApontamentoAberto( int codigoApontamento, string descricao )
+        {
+            try
+            {
+                Apontamento apontamento = _negocio.FecharApontamento( codigoApontamento, descricao );
+
+                if ( !_negocio.ValidarFechamento() )
+                {
+                    return BadRequest( _negocio.Notificacoes );
+                }
+
+                //if ( apontamento == null )
+                //{
+                //    return NotFound( _negocio.Notificacoes );
+                //}
+
+                _negocio.Alterar();
 
                 return Ok( apontamento );
             }
@@ -112,24 +97,14 @@ namespace ConProAPI.Controllers
         {
             try
             {
-                Implementacao implementacao = _contexto.Set<Implementacao>().Find( codigoImplementacao );
+                IEnumerable<Apontamento> apontamentos = _negocio.BuscarApontamentoPorImplementacao( codigoImplementacao );
 
-                if ( implementacao == null )
+                if ( apontamentos == null )
                 {
-                    return NotFound( "Nenhuma implementação com esse código foi localizado." );
+                    return NotFound( _negocio.Notificacoes );
                 }
 
-                if ( implementacao.Apontamentos == null )
-                {
-                    implementacao.Apontamentos = _contexto.Set<Apontamento>().Where( apontamento => apontamento.Implementacao.CodigoImplementacao == codigoImplementacao ).ToList();
-                }
-
-                if ( !implementacao.Apontamentos.Any() )
-                {
-                    return NotFound( "Não existe apontamentos para essa implementação." );
-                }
-
-                return Ok( implementacao.Apontamentos );
+                return Ok( apontamentos );
             }
             catch ( Exception ex )
             {

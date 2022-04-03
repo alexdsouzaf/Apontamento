@@ -1,8 +1,5 @@
 ﻿using ControladorProjetos.CamadaModelo.Entidades;
 using FluentValidation;
-using FluentValidation.Results;
-using System;
-using System.Text;
 
 namespace ControladorProjetos.CamadaNegocio.Validadores
 {
@@ -39,7 +36,7 @@ namespace ControladorProjetos.CamadaNegocio.Validadores
                 RuleFor( apontamento => apontamento.DataFim ).Equal( new DateTime() ).WithMessage( "Data de finalização é inválida." );
                 RuleFor( apontamento => apontamento.DataFim ).Equal( item => item.DataInicio ).WithMessage( "Data de finalização não pode ser igual a data de início." );
 
-                RuleFor( apontamento => apontamento.Tempo).Equal( new TimeSpan() ).WithMessage( "Não foi possível obter o tempo do apontamento." );
+                RuleFor( apontamento => apontamento.Tempo ).Equal( new TimeSpan() ).WithMessage( "Não foi possível obter o tempo do apontamento." );
             } );
         }
 

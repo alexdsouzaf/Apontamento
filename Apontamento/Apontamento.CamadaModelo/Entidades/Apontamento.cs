@@ -23,7 +23,6 @@ namespace ControladorProjetos.CamadaModelo.Entidades
         [Column( "DATA_INICIO" )]
         public DateTime DataInicio { get; set; }
 
-        [JsonIgnore]
         [Column( "DATA_FIM" )]
         public DateTime DataFim { get; set; }
 
@@ -33,18 +32,12 @@ namespace ControladorProjetos.CamadaModelo.Entidades
         [ForeignKey( "COD_IMPLEMENTACAO" )]
         public Implementacao Implementacao { get; set; }
 
-        [JsonIgnore]
         [Column( "TEMPO" )]
-        public TimeSpan Tempo { get; set; }
+        public TimeSpan Tempo { get; private set; }
 
         #endregion Propriedades
 
         #region Construtores
-
-        //internal Apontamento()
-        //{
-
-        //}
 
         public Apontamento( Implementacao implementacao )
         {
@@ -106,6 +99,15 @@ namespace ControladorProjetos.CamadaModelo.Entidades
 
 
         #endregion Internos
+
+        #region Públicos
+
+        public void CalcularTempoApontamento()
+        {
+            Tempo = DataFim - DataInicio;
+        }
+
+        #endregion Publicos
 
         #endregion Métodos
     }

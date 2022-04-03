@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder( args );
 string cadeiaConexao = builder.Configuration.GetConnectionString( "ConProDb" );
 
 builder.Services.AddDbContext<ConProContexto>( opcoes => opcoes.UseSqlServer( cadeiaConexao ) );
-builder.Services.AddSingleton<ApontamentoNegocio>();
+builder.Services.AddScoped<ImplementacaoNegocio>();
+builder.Services.AddScoped<ApontamentoNegocio>();
 builder.Services.AddControllers().AddJsonOptions( opcao => opcao.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles );
 builder.Services.AddControllers();
 
@@ -27,10 +28,8 @@ if ( app.Environment.IsDevelopment() )
     app.UseSwaggerUI();
 }
 
+app.UseDeveloperExceptionPage( new DeveloperExceptionPageOptions() );
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

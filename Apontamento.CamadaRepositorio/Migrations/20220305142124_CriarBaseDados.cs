@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace ControladorProjetos.CamadaRepositorio.Migrations
+namespace CamadaRepositorio.Migrations
 {
     public partial class CriarBaseDados : Migration
     {

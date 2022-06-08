@@ -1,7 +1,7 @@
-﻿using ControladorProjetos.CamadaModelo.Entidades;
+﻿using CamadaModelo.Entidades;
 using FluentValidation;
 
-namespace ControladorProjetos.CamadaNegocio.Validadores
+namespace CamadaNegocio.Validadores
 {
     public class ApontamentoValidador : AbstractValidator<Apontamento>
     {

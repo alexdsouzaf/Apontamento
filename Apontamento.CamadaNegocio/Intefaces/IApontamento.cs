@@ -1,4 +1,4 @@
-﻿namespace ControladorProjetos.CamadaNegocio.Intefaces
+﻿namespace CamadaNegocio.Intefaces
 {
     public interface IApontamento
     {

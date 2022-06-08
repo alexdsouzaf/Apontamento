@@ -1,5 +1,5 @@
-using ControladorProjetos.CamadaNegocio.Negocios;
-using ControladorProjetos.CamadaRepositorio;
+using CamadaNegocio.Negocios;
+using CamadaRepositorio;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 

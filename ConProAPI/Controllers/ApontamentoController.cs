@@ -1,9 +1,9 @@
 ﻿using BibliotecaPublica.CamadaNotificadora;
 using BibliotecaPublica.CamadaNotificadora.Interfaces;
-using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaNegocio.Intefaces;
-using ControladorProjetos.CamadaNegocio.Negocios;
-using ControladorProjetos.CamadaRepositorio;
+using CamadaModelo.Entidades;
+using CamadaNegocio.Intefaces;
+using CamadaNegocio.Negocios;
+using CamadaRepositorio;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 

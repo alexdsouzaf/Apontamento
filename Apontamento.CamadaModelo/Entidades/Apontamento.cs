@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace ControladorProjetos.CamadaModelo.Entidades
+namespace CamadaModelo.Entidades
 {
     [Table( "APONTAMENTO" )]
     public class Apontamento

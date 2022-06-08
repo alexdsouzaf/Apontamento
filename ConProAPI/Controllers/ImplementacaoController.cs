@@ -1,5 +1,5 @@
-﻿using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaNegocio.Negocios;
+﻿using CamadaModelo.Entidades;
+using CamadaNegocio.Negocios;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConProAPI.Controllers

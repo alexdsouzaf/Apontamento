@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ConProApi</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,8 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Apontamento.CamadaModelo\ControladorProjetos.CamadaModelo.csproj" />
     <ProjectReference Include="..\Apontamento.CamadaNegocio\ControladorProjetos.CamadaNegocio.csproj" />
-    <ProjectReference Include="..\Apontamento\Apontamento.CamadaRepositorio\ControladorProjetos.CamadaRepositorio.csproj" />
+    <ProjectReference Include="..\Apontamento.CamadaRepositorio\ControladorProjetos.CamadaRepositorio.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,9 +1,6 @@
-﻿using ControladorProjetos.CamadaModelo.Entidades;
-using Microsoft.EntityFrameworkCore;
-
-namespace ControladorProjetos.CamadaRepositorio
+﻿namespace CamadaModelo.Servicos
 {
-    public class ConProContexto : DbContext
+    public static class CalculadoraTempo
     {
         #region Atributos
 
@@ -13,19 +10,9 @@ namespace ControladorProjetos.CamadaRepositorio
 
         #region Propriedades
 
-        public DbSet<Implementacao> Implementacoes { get; set; }
-        public DbSet<CamadaModelo.Entidades.Apontamento> Apontamentos { get; set; }
+
 
         #endregion Propriedades
-
-        #region Construtores
-
-        public ConProContexto(DbContextOptions opcoes) : base(opcoes)
-        {
-
-        }
-
-        #endregion Construtores
 
         #region Métodos
 
@@ -64,6 +51,20 @@ namespace ControladorProjetos.CamadaRepositorio
 
 
         #endregion Internos
+
+        #region Públicos
+
+        public static TimeSpan CalcularTempo( DateTime dataInicial, DateTime dataFinal )
+        {
+            if ( dataInicial > dataFinal )
+            {
+                return dataInicial - dataFinal;
+            }
+
+            return dataFinal - dataInicial;
+        }
+
+        #endregion Públicos
 
         #endregion Métodos
     }

@@ -1,11 +1,11 @@
 ﻿using BibliotecaPublica.CamadaNotificadora.Interfaces;
-using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaNegocio.Intefaces;
-using ControladorProjetos.CamadaNegocio.Validadores;
-using ControladorProjetos.CamadaRepositorio;
+using CamadaModelo.Entidades;
+using CamadaNegocio.Intefaces;
+using CamadaNegocio.Validadores;
+using CamadaRepositorio;
 using FluentValidation.Results;
 
-namespace ControladorProjetos.CamadaNegocio.Negocios
+namespace CamadaNegocio.Negocios
 {
     public class ImplementacaoNegocio
     {

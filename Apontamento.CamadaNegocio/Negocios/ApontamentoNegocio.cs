@@ -1,10 +1,10 @@
-﻿using ControladorProjetos.CamadaModelo.Entidades;
-using ControladorProjetos.CamadaNegocio.Validadores;
-using ControladorProjetos.CamadaRepositorio;
+﻿using CamadaModelo.Entidades;
+using CamadaNegocio.Validadores;
+using CamadaRepositorio;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace ControladorProjetos.CamadaNegocio.Negocios
+namespace CamadaNegocio.Negocios
 {
     public class ApontamentoNegocio
     {

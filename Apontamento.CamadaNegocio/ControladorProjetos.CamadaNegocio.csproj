@@ -20,9 +20,6 @@
     <Reference Include="BibliotecaPublica">
       <HintPath>..\..\..\MEGASync\BibliotecaPublica\BibliotecaPublica.dll</HintPath>
     </Reference>
-    <Reference Include="CamadaNotificadora">
-      <HintPath>..\..\..\MEGASync\BibliotecaPublica\CamadaNotificadora.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

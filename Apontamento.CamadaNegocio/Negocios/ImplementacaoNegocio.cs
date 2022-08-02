@@ -1,5 +1,4 @@
-﻿using BibliotecaPublica.CamadaNotificadora.Interfaces;
-using CamadaModelo.Entidades;
+﻿using CamadaModelo.Entidades;
 using CamadaNegocio.Intefaces;
 using CamadaNegocio.Validadores;
 using CamadaRepositorio;
